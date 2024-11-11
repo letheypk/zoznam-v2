@@ -1,13 +1,16 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 const routes = [
+	{ path: "",
+		redirect:"/shopping-lists"
+	},
 	{
-		path: '',
+		path: '/shopping-lists',
 		name: 'Shopping List - List',
 		component: () => import('@/plugins/lib@shopping-list/shopping-lists/shopping-lists.vue')
 	},
 	{
-		path: '',
+		path: '/shopping-list/:id',
 		name: 'Shopping List - Detail',
 		component: () => import('@/plugins/lib@shopping-list/shopping-list-detail/shopping-list-detail.vue')
 	},
@@ -22,5 +25,7 @@ const router = createRouter({
 	history: createWebHashHistory(process.env.BASE_URL),
 	routes
 })
+
+
 
 export default router
