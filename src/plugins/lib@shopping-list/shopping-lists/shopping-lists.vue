@@ -1,16 +1,3 @@
-<!--<template>
-  <div>
-    <div v-if="shoppingLists === null">Nahravam</div>
-    <div v-else-if="shoppingLists && shoppingLists.error">
-      Error: {{ shoppingLists.error.message || "Error" }}
-    </div>
-    <div v-else>
-      <p>Nahrane</p>
-      <pre>{{ shoppingLists }}</pre>
-    </div>
-  </div>
-</template> -->
-
 <template>
 	<h1>Lists</h1>
 
