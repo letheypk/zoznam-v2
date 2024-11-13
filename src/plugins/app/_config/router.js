@@ -14,11 +14,7 @@ const routes = [
 		name: 'Shopping List - Detail',
 		component: () => import('@/plugins/lib@shopping-list/shopping-list-detail/shopping-list-detail.vue')
 	},
-	{
-		path: '/:catchAll(.*)',
-		name: 'NotFound',
-		component: () => import('@/plugins/app/views/not-found.vue')
-	}
+
 ]
 
 const router = createRouter({
