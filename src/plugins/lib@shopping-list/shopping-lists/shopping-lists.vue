@@ -35,7 +35,7 @@ export default {
 		const { data: { data: shoppingLists } } = await axios.get('/api/v1/shopping-lists')
 		this.shoppingList = shoppingLists.find(({ id }) => id == this.$route.params.id)
 	} catch (error) {
-		console.error('Error:', error)
+		console.error('Error:', error.response)
 		this.shoppingList = { error }
 	}
 },
