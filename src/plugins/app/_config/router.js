@@ -12,7 +12,7 @@ const routes = [
 	{
 		path: '/shopping-list/:id',
 		name: 'Shopping List - Detail',
-		component: () => import('@/plugins/lib@shopping-list/shopping-list-detail/shopping-list-detail.vue')
+		component: () => import('@/plugins/lib@shopping-list/shopping-list-detail/a-list.vue')
 	},
 
 ]
