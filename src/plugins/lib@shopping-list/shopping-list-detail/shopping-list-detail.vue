@@ -6,11 +6,11 @@
     <ul>
       <li v-for="item in shoppingList.items" :key="item.id">
         <input type="checkbox" :checked="item.is_checked" @click="toggleItem(item)"/>
-        {{ item.name }} - {{ item.amount }} {{ item.unit }}
+        {{ item.name }} - {{ item.value }} {{ item.unit }}
       </li>
     </ul>
 
-    <input v-model="newItemName" @keyup.enter="addItem" placeholder="Prida5 nov] polo6ku"/>
+    <input v-model="newItemName" @keyup.enter="addItem" placeholder="Pridať novú položku"/>
   </div>
 </template>
 
@@ -28,10 +28,18 @@ export default {
 
   methods: {
     loadShoppingList() {
-      fetch('https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/' + this.$route.params.id)
+      fetch('https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/')
         .then((response) => response.json())
         .then((data) => {
-          this.shoppingList = data;
+          console.log(data.data, this.$route.params.id)
+          data.data.forEach(element => {
+            console.log('eh?', element, element.id)
+            if (element.id == this.$route.params.id) {
+              this.shoppingList.items = element.items
+              console.log('pridavame', element.items)
+            }
+          });
+          console.log('data? ', data, this.shoppingList.items, this.$route.params.id)
         })
         .catch((error) => {
           console.log('Error bol tu:', error);
@@ -71,8 +79,9 @@ export default {
 
       const newItem = {
         name: this.newItemName,
-        amount: 1, 
-        unit: 'foo', 
+        unit: 'piece', 
+        value: 1,
+        is_checked: false
       };
 
       fetch(
