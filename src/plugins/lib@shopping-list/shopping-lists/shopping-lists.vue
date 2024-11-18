@@ -32,7 +32,7 @@ export default {
 
 	async mounted() {
 		try {
-			const { data: { data: shoppingLists } } = await axios.get('/api/v1/shopping-lists')
+			const { data: { data: shoppingLists } } = await axios.get('https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/')
 			this.shoppingLists = shoppingLists 
 		} catch (error) {
 			console.error('Error:', error.response)
@@ -46,3 +46,8 @@ export default {
 	}
 }
 </script>
+<style>
+ a {
+	text-decoration: none;
+ }
+</style>
