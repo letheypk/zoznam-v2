@@ -31,14 +31,14 @@ export default {
 	},
 
 	async mounted() {
-	try {
-		const { data: { data: shoppingLists } } = await axios.get('/api/v1/shopping-lists')
-		this.shoppingList = shoppingLists.find(({ id }) => id == this.$route.params.id)
-	} catch (error) {
-		console.error('Error:', error.response)
-		this.shoppingList = { error }
-	}
-},
+		try {
+			const { data: { data: shoppingLists } } = await axios.get('/api/v1/shopping-lists')
+			this.shoppingLists = shoppingLists 
+		} catch (error) {
+			console.error('Error:', error.response)
+			this.shoppingLists = { error } 
+		}
+	},
 	methods: {
 		openShoppingListDetail({ id }) {
 			this.$router.push({ name: 'Shopping List - Detail', params: { id } })
