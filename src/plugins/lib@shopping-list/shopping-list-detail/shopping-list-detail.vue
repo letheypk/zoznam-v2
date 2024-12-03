@@ -1,113 +1,267 @@
 <template>
-  <div>
-    <h1>{{ shoppingList.name }}</h1>
-    <button @click="deleteList">Delete List</button>
+  <div class="shopping-list-container">
+    <div class="header">
+      <h1>{{ shoppingList.name }}</h1>
+      <div class="actions">
+        <button @click="goBack" class="back-btn">← Back</button>
+        <button @click="deleteList" class="delete-btn">Delete List</button>
+      </div>
+    </div>
 
-    <ul>
-      <li v-for="item in shoppingList.items" :key="item.id">
-        <input type="checkbox" :checked="item.is_checked" @click="toggleItem(item)"/>
-        {{ item.name }} - {{ item.value }} {{ item.unit }}
+    <ul class="items">
+      <li 
+        v-for="item in shoppingList.items" 
+        :key="item.id" 
+        :class="{ checked: item.is_checked }"
+      >
+        <label>
+          <input 
+            type="checkbox" 
+            :checked="item.is_checked" 
+            @click="toggleItem(item)"
+          />
+          <span>{{ item.name }} - {{ item.value }} {{ item.unit }}</span>
+        </label>
       </li>
     </ul>
 
-    <input v-model="newItemName" @keyup.enter="addItem" placeholder="Pridať novú položku"/>
+    <div class="add-item">
+      <input 
+        v-model="newItemName" 
+        @keyup.enter="addItem" 
+        placeholder="Add a new item" 
+      />
+      <button @click="addItem" class="add-btn">Add</button>
+    </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
-      shoppingList: { name: '', items: [] }, 
-      newItemName: '', 
+      shoppingList: { name: '', items: [] },
+      newItemName: '',
     };
   },
+
   mounted() {
-    this.loadShoppingList(); 
+    this.loadShoppingList();
   },
 
   methods: {
-    loadShoppingList() {
-      fetch('https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/')
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data.data, this.$route.params.id)
-          data.data.forEach(element => {
-            console.log('eh?', element, element.id)
-            if (element.id == this.$route.params.id) {
-              this.shoppingList.items = element.items
-              console.log('pridavame', element.items)
-            }
-          });
-          console.log('data? ', data, this.shoppingList.items, this.$route.params.id)
-        })
-        .catch((error) => {
-          console.log('Error bol tu:', error);
-        });
-    },
-
-    
-    toggleItem(item) {
-      item.is_checked = !item.is_checked; 
-      const updatedItem = { is_checked: item.is_checked };
-
-      fetch(
-        `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/${this.$route.params.id}/items/${item.id}`,
-        {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updatedItem),
+    async loadShoppingList() {
+      try {
+        const { data } = await axios.get('https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/');
+        const list = data.data.find((item) => item.id == this.$route.params.id);
+        if (list) {
+          this.shoppingList = list;
+        } else {
+          console.error('Nenašlo shopping list');
         }
-      )
-        .catch((error) => {
-          console.log('Error bol tu:', error);
-        });
+      } catch (error) {
+        console.error('Nenacitalo shopping:', error);
+      }
     },
 
-      deleteList() {
-        fetch(`https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/${this.$route.params.id}`, {
-        method: 'DELETE',
-      })
-        .then(() => {
-          alert('Zmazane');
-    });
-  },
+    goBack() {
+      this.$router.push('/shopping-lists');
+    },
 
+    async toggleItem(item) {
+      const originalChecked = item.is_checked;
+      item.is_checked = !originalChecked;
 
-    addItem() {
-      if (!this.newItemName.trim()) return; 
+      try {
+        await axios.put(
+          `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/${this.$route.params.id}/items/${item.id}`,
+          { is_checked: item.is_checked }
+        );
+      } catch (error) {
+        console.error('Error update:', error);
+        item.is_checked = originalChecked;
+      }
+    },
+
+    async deleteList() {
+      try {
+        await axios.delete(
+          `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/${this.$route.params.id}`
+        );
+        alert('Úspech');
+        this.$router.push('/shopping-lists');
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Fail');
+      }
+    },
+
+    async addItem() {
+      if (!this.newItemName.trim()) return;
 
       const newItem = {
         name: this.newItemName,
-        unit: 'piece', 
+        unit: 'piece',
         value: 1,
-        is_checked: false
+        is_checked: false,
       };
 
-      fetch(
-        `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/${this.$route.params.id}/items`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newItem),
+      try {
+        const response = await axios.post(
+          `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/${this.$route.params.id}/items`,
+          newItem
+        );
+
+        if (response.status === 201) {
+          this.newItemName = '';
+          this.loadShoppingList();
         }
-      )
-        .then((response) => {
-          if (response.ok) {
-            this.newItemName = ''; 
-            this.loadShoppingList(); //refresh 
-          } else {
-            alert('Nevydalo');
-          }
-        })
-        .catch((error) => {
-          console.log('Error bol tu:', error);
-        });
+      } catch (error) {
+        console.error('Error add:', error);
+        alert('Fail add');
+      }
     },
   },
 };
 </script>
 
 <style scoped>
+.shopping-list-container {
+  font-family: Arial, sans-serif;
+  margin: 20px auto;
+  max-width: 600px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #242323;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: 24px;
+  margin: 0;
+  color: #333;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.back-btn {
+  background-color: #ddd;
+  color: #333;
+  transition: background-color 0.3s;
+}
+
+.back-btn:hover {
+  background-color: #bbb;
+}
+
+.delete-btn {
+  background-color: #e74c3c;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.delete-btn:hover {
+  background-color: #c0392b;
+}
+
+.items {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+}
+
+.items li {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: white;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.items li:hover {
+  background-color: #f5f5f5;
+  transform: scale(1.02);
+}
+
+.items li.checked {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.add-item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.add-item input {
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.add-btn {
+  background-color: #2ecc71;
+  color: white;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.add-btn:hover {
+  background-color: #27ae60;
+}
+
+@media (max-width: 600px) {
+  .shopping-list-container {
+    padding: 15px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  button {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+}
 </style>

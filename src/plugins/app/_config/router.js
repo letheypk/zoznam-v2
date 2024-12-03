@@ -14,6 +14,11 @@ const routes = [
 		name: 'Shopping List - Detail',
 		component: () => import('@/plugins/lib@shopping-list/shopping-list-detail/shopping-list-detail.vue')
 	},
+	{
+		path: '/:catchAll(.*)',
+		name: 'NotFound',
+		component: () => import('@/plugins/lib@not-found/not-found.vue')
+	},
 
 ]
 

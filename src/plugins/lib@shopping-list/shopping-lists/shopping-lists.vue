@@ -12,7 +12,7 @@
 	<template v-else>
 		Počet položiek v zozname: {{ shoppingLists.length }}
 	
-		<div v-for="shoppingList in shoppingLists" :key="`shopping-list-cart-${shoppingList.id}`">
+		<div v-for="shoppingList in shoppingLists" :key="shoppingList.id">
 			<a :href="`/shopping-lists/${shoppingList.id}`" @click.prevent="openShoppingListDetail(shoppingList)">
 				{{ shoppingList.title }}
 			</a>
@@ -50,4 +50,5 @@ export default {
  a {
 	text-decoration: none;
  }
+
 </style>
