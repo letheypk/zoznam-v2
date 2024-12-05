@@ -241,24 +241,4 @@ label {
   background-color: #27ae60;
 }
 
-@media (max-width: 600px) {
-  .shopping-list-container {
-    padding: 15px;
-  }
-
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  h1 {
-    font-size: 20px;
-  }
-
-  button {
-    font-size: 12px;
-    padding: 6px 10px;
-  }
-}
 </style>
