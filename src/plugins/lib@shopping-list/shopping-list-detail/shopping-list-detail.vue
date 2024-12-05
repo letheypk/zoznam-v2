@@ -9,20 +9,12 @@
     </div>
 
     <ul class="items">
-      <li 
-        v-for="item in shoppingList.items" 
-        :key="item.id" 
-        :class="{ checked: item.is_checked }"
-      >
-        <label>
-          <input 
-            type="checkbox" 
-            :checked="item.is_checked" 
-            @click="toggleItem(item)"
-          />
-          <span>{{ item.name }} - {{ item.value }} {{ item.unit }}</span>
-        </label>
-      </li>
+      <ShoppingListItem
+        v-for="item in shoppingList.items"
+        :key="item.id"
+        :item="item"
+        @toggle-item="toggleItem"
+      />
     </ul>
 
     <div class="add-item">
@@ -38,8 +30,14 @@
 
 <script>
 import axios from 'axios';
+import ShoppingListItem from '../shopping-lists/shopping-list-item.vue';
 
 export default {
+
+  components: {
+    ShoppingListItem,
+  },
+
   data() {
     return {
       shoppingList: { name: '', items: [] },
@@ -113,11 +111,10 @@ export default {
           `https://shoppinglist.wezeo.dev/cms/api/v1/shopping-lists/${this.$route.params.id}/items`,
           newItem
         );
+        this.shoppingList.items.push(response.data.data);
+        this.newItemName = "";
 
-        if (response.status === 201) {
-          this.newItemName = '';
-          this.loadShoppingList();
-        }
+ 
       } catch (error) {
         console.error('Error add:', error);
         alert('Fail add');

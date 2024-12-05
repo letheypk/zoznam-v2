@@ -17,6 +17,7 @@
 				{{ shoppingList.title }}
 			</a>
 		</div>
+		
 	</template>
 </template>
 
