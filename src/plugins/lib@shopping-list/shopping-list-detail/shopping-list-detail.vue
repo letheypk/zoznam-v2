@@ -30,7 +30,7 @@
 
 <script>
 import axios from 'axios';
-import ShoppingListItem from '../shopping-lists/shopping-list-item.vue';
+import ShoppingListItem from './a-shopping-list-item/A-shopping-list-item.vue';
 
 export default {
 
